@@ -1,28 +1,7 @@
-// This file is part of arduino-fsm.
-//
-// arduino-fsm is free software: you can redistribute it and/or modify it under
-// the terms of the GNU Lesser General Public License as published by the Free
-// Software Foundation, either version 3 of the License, or (at your option)
-// any later version.
-//
-// arduino-fsm is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
-// for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with arduino-fsm.  If not, see <http://www.gnu.org/licenses/>.
-
 #ifndef FSM_H
 #define FSM_H
 
-
-#if defined(ARDUINO) && ARDUINO >= 100
-  #include <Arduino.h>
-#else
-  #include <WProgram.h>
-#endif
-
+#include <Arduino.h>
 
 struct State
 {
@@ -32,33 +11,29 @@ struct State
   void (*on_exit)();
 };
 
-
 class Fsm
 {
 public:
-  Fsm(State* initial_state);
+  // Constructor and Destructor
+  Fsm(State *initial_state);
   ~Fsm();
 
-  void add_transition(State* state_from, State* state_to, int event,
-                      void (*on_transition)());
-
-  void add_timed_transition(State* state_from, State* state_to,
-                            unsigned long interval, void (*on_transition)());
-
+  // Public Methods
+  void add_transition(State *state_from, State *state_to, int event, void (*on_transition)());
+  void add_timed_transition(State *state_from, State *state_to, unsigned long interval, void (*on_transition)());
   void check_timed_transitions();
-
   void trigger(int event);
   void run_machine();
 
 private:
   struct Transition
   {
-    State* state_from;
-    State* state_to;
+    State *state_from;
+    State *state_to;
     int event;
     void (*on_transition)();
-
   };
+
   struct TimedTransition
   {
     Transition transition;
@@ -66,20 +41,18 @@ private:
     unsigned long interval;
   };
 
-  static Transition create_transition(State* state_from, State* state_to,
-                                      int event, void (*on_transition)());
+  // Private Methods
+  static Transition create_transition(State *state_from, State *state_to, int event, void (*on_transition)());
+  void make_transition(Transition *transition);
 
-  void make_transition(Transition* transition);
-
-private:
-  State* m_current_state;
-  Transition* m_transitions;
+  // Private Members
+  State *m_current_state;
+  Transition *m_transitions;
   int m_num_transitions;
 
-  TimedTransition* m_timed_transitions;
+  TimedTransition *m_timed_transitions;
   int m_num_timed_transitions;
   bool m_initialized;
 };
-
 
 #endif
